@@ -2,6 +2,44 @@
 // var stringifyJSON = JSON.stringify;
 
 // but you don't so you're going to have to write it from scratch:
+
+var obj = {'property': 'hello', butt: 'ass', number: undefined};
+
 var stringifyJSON = function (obj) {
-  // your code goes here
+
+  var keysArr = Object.keys(obj),
+      strArr = [],
+      index = 0;
+
+  function loop () {
+
+    if (index >= keysArr.length) {
+      return strArr.join();
+    } else {
+      var prop =  keysArr[index],
+          value = obj[prop],
+          propVal;
+      console.log('this is: ' + value)
+      if (typeof value === 'undefined' || Function.prototype.isPrototypeOf(value)) {
+        index++;
+        console.log('activated');
+        loop();
+      }
+      else if (typeof value == 'string') {
+          propVal = '\"' + prop + '\"' + ':' + '\"' + value + '\"';
+      } else {
+          propVal = '\"' + prop + '\"' + ':' + value;
+      }
+
+      strArr.push(propVal);
+      index++;
+      loop();
+    }
+  }
+
+  loop();
+  return "{" + strArr.join() + "}";
+
 };
+
+console.log(stringifyJSON(obj));
