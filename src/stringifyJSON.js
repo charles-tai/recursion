@@ -3,7 +3,7 @@
 
 // but you don't so you're going to have to write it from scratch:
 
-var obj = {'property': 'hello', butt: 'ass', number: undefined};
+var obj = {'property': 'hello', butt: 'ass', number: function(){}};
 
 var stringifyJSON = function (obj) {
 
@@ -22,7 +22,6 @@ var stringifyJSON = function (obj) {
       console.log('this is: ' + value)
       if (typeof value === 'undefined' || Function.prototype.isPrototypeOf(value)) {
         index++;
-        console.log('activated');
         loop();
       }
       else if (typeof value == 'string') {
@@ -30,10 +29,11 @@ var stringifyJSON = function (obj) {
       } else {
           propVal = '\"' + prop + '\"' + ':' + value;
       }
-
-      strArr.push(propVal);
-      index++;
-      loop();
+      if (propVal) {
+        strArr.push(propVal);
+        index++;
+        loop();
+      }
     }
   }
 
