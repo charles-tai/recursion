@@ -1,3 +1,7 @@
+// this is what you would do if you liked things to be easy:
+// var stringifyJSON = JSON.stringify;
+
+// but you don't so you're going to have to write it from scratch:
 var arrayWithValidElements = [
   9,
   null,
@@ -25,7 +29,7 @@ var arrayWithValidElements = [
 // used for stringifyJSON spec
 // hint: JSON does not allow you to stringify functions or
 // undefined values, so you should skip those key/value pairs.
-var objectWithInvalidAttributes = [
+var nonStringifiableValues = [
   {
     'a-function': function(){},
     'an-integer': 1,
@@ -34,36 +38,22 @@ var objectWithInvalidAttributes = [
   }
 ];
 
-// used for stringifyJSON and parseJSON specs
-var arrayWithInvalidStrings = [
-  '["foo", "bar"',
-  '["foo", "bar\\"]'
-];
-
-// this is what you would do if you liked things to be easy:
-// var stringifyJSON = JSON.stringify;
-
-// but you don't so you're going to have to write it from scratch:
-
-var obj = {'property': 'hello', butt: 'ass', number: function(){}};
-
-function testCaseRunner (func, array) {
-  array.forEach( function (ele) {
-    console.log('testcase: ' + ele + ' // ' + 'result: ' + func(ele))
-    });
-}
-
 var stringifyJSON = function (obj) {
 
 
   if (Array.isArray(obj)) {
     return mapArray(obj,0);
-  } else if ( typeof obj === 'string')
-    return '\"' + obj + '\"';
   } else {
-    return obj + "";
-  }
+    return numString(obj)
+  };
 
+  function numString(obj) {
+    if ( typeof obj === 'string') {
+        return '\"' + obj + '\"';
+      } else {
+        return obj + "";
+      };
+  }
 
 
   function mapArray(list,y) {
@@ -77,7 +67,11 @@ var stringifyJSON = function (obj) {
       return mapArray(list,y+1);
     } else {
     // Replace with string
-      list[y] = list[y] + "";
+      if ( typeof list[y] === 'string') {
+        list[y] = "\"" + list[y] + "\"";
+      } else {
+        list[y] = list[y];
+      };
     // Iterate through array
       return mapArray(list,y+1);
     }
@@ -86,3 +80,6 @@ var stringifyJSON = function (obj) {
 
 
 };
+
+
+console.log(stringifyJSON(arrayWithValidElements));
