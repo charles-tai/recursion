@@ -55,73 +55,34 @@ function testCaseRunner (func, array) {
 
 var stringifyJSON = function (obj) {
 
-  var strArr = [];
-  var index = 0;
 
-  if (typeof obj == 'object' && obj !== null && !Array.isArray(obj)) {
-
-    var keysArr = Object.keys(obj);
-
-    function loop () {
-
-      if (index >= keysArr.length) {
-        return strArr.join();
-      } else {
-        var prop =  keysArr[index];
-        var value = obj[prop];
-        var propVal;
-
-        if (typeof value == 'undefined' || Function.prototype.isPrototypeOf(value)) {
-          index++;
-          loop();
-        }
-        else if (typeof value == 'string') {
-            propVal = '\"' + prop + '\"' + ':' + '\"' + value + '\"';
-        } else {
-            propVal = '\"' + prop + '\"' + ':' + value;
-        }
-        if (propVal) {
-          strArr.push(propVal);
-          index++;
-          loop();
-        }
-      }
-    }
-    loop();
-    return "{" + strArr.join() + "}";
+  if (Array.isArray(obj)) {
+    return mapArray(obj,0);
+  } else if ( typeof obj === 'string')
+    return '\"' + obj + '\"';
   } else {
-    if (Array.isArray(obj)){
-      obj.forEach(function(ele){
-
-        function loopEle() {
-          if (Array.isArray(ele)) {
-            ele.forEach(function (ele) {
-
-            })
-          }
-        }
-
-        if (Array.isArray(ele)) {
-
-        }
-        else if (typeof ele === 'string') {
-        strArr.push('\"' + ele + '\"');
-        } else {
-        strArr.push(ele);
-        }
-      })
-      return '[' + strArr.join() + ']';
-    } else {
-      if (typeof obj === 'string') {
-        return '\"' + obj + '\"';
-      } else {
-        return obj + "";
-      }
-    }
+    return obj + "";
   }
 
 
 
-};
+  function mapArray(list,y) {
+    // Base Case
+    if ( y === list.length ) {
+     return '[' + list.join() + ']';
+    }
+    // Recursive Case
+    if (Array.isArray(list[y])) {
+      list[y] = mapArray(list[y],0);
+      return mapArray(list,y+1);
+    } else {
+    // Replace with string
+      list[y] = list[y] + "";
+    // Iterate through array
+      return mapArray(list,y+1);
+    }
+  };
 
-testCaseRunner(stringifyJSON, arrayWithValidElements);
+
+
+};
