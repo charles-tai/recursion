@@ -11,17 +11,19 @@ var stringifyJSON = function (obj) {
 
 
   if (Array.isArray(obj)) {
-    return mapArray(obj,0);
+    return mapArray(obj.slice(),0);
+  } else if (Object.prototype.isPrototypeOf(obj)) {
+    return mapObject(obj,0);
   } else {
-    return numString(obj)
-  };
+    return numString(obj);
+  }
 
   function numString(obj) {
     if ( typeof obj === 'string') {
         return '\"' + obj + '\"';
       } else {
         return obj + "";
-      };
+      }
   }
 
 
@@ -32,7 +34,10 @@ var stringifyJSON = function (obj) {
     }
     // Recursive Case
     if (Array.isArray(list[y])) {
-      list[y] = mapArray(list[y],0);
+      list[y] = mapArray(list[y].slice(),0);
+      return mapArray(list,y+1);
+    } else if (Object.prototype.isPrototypeOf(list[y])) {
+      list[y] = mapObject(list[y],0);
       return mapArray(list,y+1);
     } else {
     // Replace with string
@@ -40,15 +45,48 @@ var stringifyJSON = function (obj) {
         list[y] = "\"" + list[y] + "\"";
       } else {
         list[y] = list[y];
-      };
+      }
     // Iterate through array
       return mapArray(list,y+1);
     }
-  };
+  }
 
+  function mapObject(list,y) {
 
+    var sum = '';
+
+    function loop (list,y) {
+      var propArray = Object.keys(list);
+      var prop = propArray[y];
+      var propVal = list[prop];
+      // Base Case
+      if ( y === propArray.length ) {
+       return '{' + sum + '}';
+      }
+      // Recursive Case
+      if (typeof propVal === 'undefined' || Function.prototype.isPrototypeOf(propVal)) {
+        return loop(list, y+1);
+      } else if (Array.isArray(propVal)) {
+        sum += "\"" + propArray[y] + "\"" + ':' + mapArray(propVal.slice(), 0);
+      } else if (Object.prototype.isPrototypeOf(propVal)) {
+        sum += "\"" + propArray[y] + "\"" + ':' + mapObject(propVal, 0);
+      } else {
+      // Replace with string
+        if ( typeof list[prop] === 'string') {
+          sum += "\"" + propArray[y] + "\"" + ':' + "\"" + list[prop] + "\"";
+        } else {
+          sum += "\"" + propArray[y] + "\"" + ':' +  list[prop];
+        }
+      }
+      if (y+1 !== propArray.length){
+        sum += ',';
+      }
+      return loop(list, y+1);
+    }
+
+    return loop(list,0);
+  }
 
 };
-
-
-console.log(stringifyJSON(arrayWithValidElements));
+var testObj = {'color': 'brown', 'eyes': [{'greetings': 'hello', 'energy': {'low': [2]} }] };
+console.log(stringifyJSON(testObj));
