@@ -8,32 +8,31 @@
 // But in stead we're going to implement it from scratch:
 function getElementsByClassName(target) {
 
-  var elementList = []; // list of elements with class that matches target
-  var index = 0; // for elementList
-  var location = document.body;
+  var targetElements = []; // list of elements with class that matches target
+  var index = 0; // for targetElements
 
-  function loop (target,location) {
-    var docElements = location.children;
-    // Iterate through document location's children
-    for (var i = 0; i < docElements.length; i++) {
+  function loop (target, parentNode) {
+    var elementNodes = parentNode.children;
+    // Iterate through parentNode's elementNodes
+    for (var i = 0; i < elementNodes.length; i++) {
       // Recursive Case: checks if iteration contains children
-      if (docElements[i].children.length > 0) {
-        loop(target, docElements[i]);
+      if (elementNodes[i].children.length > 0) {
+        loop(target, elementNodes[i]);
       }
       // Check if it possesses class
-      if(docElements[i].classList.length !== 0) {
+      if(elementNodes[i].classList.length !== 0) {
         // Check if class matches specified class
-        var namesList = docElements[i].className.split(' ');
-        for (var j = 0; j < namesList.length; j++) {
-          if (namesList[j] === target) {
-            elementList[index] = docElements[i];
+        var classNames = elementNodes[i].className.split(' ');
+        for (var j = 0; j < classNames.length; j++) {
+          if (classNames[j] === target) {
+            targetElements[index] = elementNodes[i];
             index++;
           }
         }
       }
     }
   }
-  loop(target,location);
-  console.log(elementList);
-  return elementList;
+  loop(target,document.body);
+  console.log(targetElements);
+  return targetElements;
 }
