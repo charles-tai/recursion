@@ -9,12 +9,15 @@
 
 var stringifyJSON = function (obj) {
 
-
+  // Control flow
   if (Array.isArray(obj)) {
+    // Copy array, so it doesn't alter original
     return mapArray(obj.slice(),0);
   } else if (Object.prototype.isPrototypeOf(obj)) {
+    // Objects
     return mapObject(obj,0);
   } else {
+    // All primitive values
     return numString(obj);
   }
 
@@ -56,29 +59,28 @@ var stringifyJSON = function (obj) {
     var sum = '';
 
     function loop (list,y) {
-      var propArray = Object.keys(list);
-      var prop = propArray[y];
-      var propVal = list[prop];
+      var objKeys = Object.keys(list);
+      var key = objKeys[y];
       // Base Case
-      if ( y === propArray.length ) {
+      if ( y === objKeys.length ) {
        return '{' + sum + '}';
       }
       // Recursive Case
-      if (typeof propVal === 'undefined' || Function.prototype.isPrototypeOf(propVal)) {
+      if (typeof list[key] === 'undefined' || Function.prototype.isPrototypeOf(list[key])) {
         return loop(list, y+1);
-      } else if (Array.isArray(propVal)) {
-        sum += "\"" + propArray[y] + "\"" + ':' + mapArray(propVal.slice(), 0);
-      } else if (Object.prototype.isPrototypeOf(propVal)) {
-        sum += "\"" + propArray[y] + "\"" + ':' + mapObject(propVal, 0);
+      } else if (Array.isArray(list[key])) {
+        sum += "\"" + objKeys[y] + "\"" + ':' + mapArray(list[key].slice(), 0);
+      } else if (Object.prototype.isPrototypeOf(list[key])) {
+        sum += "\"" + objKeys[y] + "\"" + ':' + mapObject(list[key], 0);
       } else {
       // Replace with string
-        if ( typeof list[prop] === 'string') {
-          sum += "\"" + propArray[y] + "\"" + ':' + "\"" + list[prop] + "\"";
+        if ( typeof list[key] === 'string') {
+          sum += "\"" + objKeys[y] + "\"" + ':' + "\"" + list[key] + "\"";
         } else {
-          sum += "\"" + propArray[y] + "\"" + ':' +  list[prop];
+          sum += "\"" + objKeys[y] + "\"" + ':' +  list[key];
         }
       }
-      if (y+1 !== propArray.length){
+      if (y+1 !== objKeys.length){
         sum += ',';
       }
       return loop(list, y+1);
@@ -88,5 +90,30 @@ var stringifyJSON = function (obj) {
   }
 
 };
-var testObj = {'color': 'brown', 'eyes': [{'greetings': 'hello', 'energy': {'low': [2]} }] };
-console.log(stringifyJSON(testObj));
+var testObj = [
+  9,
+  null,
+  true,
+  false,
+  "Hello world",
+  [],
+  [8],
+  ["hi"],
+  [8, "hi"],
+  [1, 0, -1, -0.3, 0.3, 1343.32, 3345, 0.00011999999999999999],
+  [8, [[],3,4]],
+  [[[["foo"]]]],
+  {},
+  {"a": "apple"},
+  {"foo": true, "bar": false, "baz": null},
+  {"boolean, true": true, "boolean, false": false, "null": null },
+  // basic nesting
+  {"a":{"b":"c"}},
+  {"a":["b", "c"]},
+  [{"a":"b"}, {"c":"d"}],
+  {"a":[],"c": {}, "b": true}
+];
+testObj.forEach( function (ele) {
+  var sum = stringifyJSON(ele) + ' // ' + ele
+  console.log(sum);
+});
